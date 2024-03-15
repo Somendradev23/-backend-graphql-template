@@ -2,7 +2,7 @@
   "name": "fb-tool-node",
   "version": "1.0.0",
   "description": "",
-  "main": "server.ts",
+  "main": "src/server.ts",
   "scripts": {
     "start": "nodemon src/index.ts",
     "build": "rimraf dist && tsc",
