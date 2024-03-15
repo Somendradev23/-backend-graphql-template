@@ -11,6 +11,9 @@ import { resolvers } from "./graphql";
 import { typeDefs } from "./graphql/schema/typedefs";
 import yenv from "yenv";
 import fileUpload from "express-fileupload";
+// import { checkNull } from "./utils";
+// import { checkError } from "./error";
+
 require("./config/connection");
 import route from "./RestApi/restRoute";
 
@@ -32,7 +35,7 @@ const startServer = async () => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
   app.get("/", (_req: Request, res: Response) => {
-   res.send("Express Typescript on Vercel");
+    res.send("Express Typescript on Vercel");
   });
   app.use(
     fileUpload({
@@ -60,8 +63,10 @@ const startServer = async () => {
 
     expressMiddleware(server, {
       context: async ({ req, res }) => {
-        const { loginId, userId } = await authMiddleware(req);
-        
+        const authResult = await authMiddleware(req);
+        // checkNull(authResult, "authResult");
+        // checkError(authResult);
+        const { loginId, userId } = authResult;
         return {
           loginId,
           userId,
@@ -70,19 +75,10 @@ const startServer = async () => {
     })
     // expressMiddleware(server, {})
   );
-
-  // await new Promise<void>((resolve) =>
-  //   httpServer.listen(
-  //     {
-  //       port: 5001,
-  //     },
-  //     resolve
-  //   )
-  // );
-
   app.listen(5000, () => {
     // tslint:disable-next-line
     console.log("🚀 Server ready at http://localhost:5000/graphql");
   });
 };
 startServer();
+
