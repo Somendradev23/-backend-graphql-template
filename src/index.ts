@@ -17,9 +17,9 @@ import route from "./RestApi/restRoute";
 import { authMiddleware } from "./graphql/schema";
 const startServer = async () => {
   yenv("env.yaml", { env: "development" });
-  const router = express();
+  const app = express();
 
-  router.use(
+  app.use(
     cors({
       origin: "*",
       methods: ["GET", "POST"],
@@ -28,22 +28,22 @@ const startServer = async () => {
   );
 
   const publicPath = path.join(__dirname, "public");
-  router.use(express.static(publicPath));
-  router.use(express.json());
-  router.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
-  router.get("/", (_req: Request, res: Response) => {
+  app.use(express.static(publicPath));
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+  app.get("/", (_req: Request, res: Response) => {
    res.send("Express Typescript on Vercel");
   });
-  router.use(
+  app.use(
     fileUpload({
       useTempFiles: true,
     })
   );
-  router.use(route);
-  router.use((req, res, next) => {
+  app.use(route);
+  app.use((req, res, next) => {
     next();
   });
-  const httpServer = http.createServer(router);
+  const httpServer = http.createServer(app);
 
   const server: any = new ApolloServer({
     typeDefs,
@@ -53,7 +53,7 @@ const startServer = async () => {
 
   await server.start();
 
-  router.use(
+  app.use(
     "/graphql",
     cors<cors.CorsRequest>(),
     bodyParser.json({ limit: "50mb" }),
@@ -80,7 +80,7 @@ const startServer = async () => {
   //   )
   // );
 
-  router.listen(5000, () => {
+  app.listen(5000, () => {
     // tslint:disable-next-line
     console.log("🚀 Server ready at http://localhost:5000/graphql");
   });
